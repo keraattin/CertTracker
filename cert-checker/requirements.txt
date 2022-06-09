@@ -1,0 +1,5 @@
+flask
+pytz
+Flask-Cors
+dataclasses
+cryptography == 37.0.2

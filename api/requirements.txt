@@ -1,0 +1,9 @@
+flask
+SQLAlchemy
+Flask_SQLAlchemy
+dataclasses
+schedule
+requests
+pytz
+Flask-Cors
+marshmallow
