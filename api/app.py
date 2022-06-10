@@ -37,6 +37,12 @@ with app.app_context():
 
 # CORS
 CORS(app)
+
+# If the flask returned a 308 redirect response,
+# It is not allowed by Cors preflight request
+# This is why setting url_map.strict_slashes to False
+# https://github.com/keraattin/CertTracker/issues/4
+app.url_map.strict_slashes = False
 ##############################################################################
 
 # Blueprints
