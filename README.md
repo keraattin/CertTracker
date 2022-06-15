@@ -101,7 +101,7 @@ docker-compose up --build
 
 ## Roadmap
 
-- [ ] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
+- [X] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
 - [ ] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
 - [ ] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
 
