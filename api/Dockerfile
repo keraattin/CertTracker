@@ -21,4 +21,4 @@ RUN cp /usr/share/zoneinfo/Etc/UTC /etc/localtime
 RUN echo "Etc/UTC" > /etc/timezone
 RUN apk del tzdata
 
-CMD ["python3","/api/app.py"]
+CMD ["/bin/sh","/api/entrypoint.sh"]

@@ -2,7 +2,7 @@ flask
 SQLAlchemy
 Flask_SQLAlchemy
 dataclasses
-schedule
+APScheduler
 requests
 pytz
 Flask-Cors
