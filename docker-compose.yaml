@@ -7,6 +7,7 @@ services:
         - "5000:5000"
       volumes:
         - './api/Database:/api/Database'
+        - './api/Logs:/api/Logs'
     cert-checker:
       build: ./cert-checker
       ports:
