@@ -7,3 +7,4 @@ requests
 pytz
 Flask-Cors
 marshmallow
+cryptography == 37.0.2

@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
     api:
       build: ./api
@@ -8,12 +6,6 @@ services:
       volumes:
         - './api/Database:/api/Database'
         - './api/Logs:/api/Logs'
-    cert-checker:
-      build: ./cert-checker
-      ports:
-        - "5001:5001"
-      volumes:
-        - './cert-checker/logs:/cert-checker/logs'
     frontend:
       build: ./frontend
       ports:
