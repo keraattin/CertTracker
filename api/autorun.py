@@ -2,8 +2,6 @@
 
 # Libraries
 ##############################################################################
-from pytz import timezone
-import requests
 from apscheduler.schedulers.blocking import BlockingScheduler
 from app import app
 import logging
@@ -29,10 +27,19 @@ def job():
     log.info("job started")
     with app.app_context():
         from DnsRecord.models import DnsRecord
-        from Cert.views import cert_check
+        from Cert.service import CertService
         dns_records = DnsRecord.query.all()
         for dns_record in dns_records:
-            cert_check(dns_record.id)
+            try:
+                CertService.run_check(dns_record.id)
+                log.info(
+                    "checked %s:%s", dns_record.dns, dns_record.ssl_port
+                )
+            except Exception as e:
+                log.error(
+                    "failed to check %s:%s — %s",
+                    dns_record.dns, dns_record.ssl_port, e,
+                )
     log.info("job finished")
 ##############################################################################
 
@@ -42,7 +49,7 @@ def job():
 try:
     scheduler.start()
 except (KeyboardInterrupt, SystemExit):
-    # Not strictly necessary if daemonic mode is enabled 
+    # Not strictly necessary if daemonic mode is enabled
     # but should be done if possible
     scheduler.shutdown()
 ##############################################################################

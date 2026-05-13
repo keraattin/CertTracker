@@ -23,7 +23,9 @@ HOST    = "0.0.0.0"
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 # Database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Database/database.db'
+# Absolute path so it works regardless of Flask-SQLAlchemy version: 3.x
+# resolves relative SQLite URIs against app.instance_path, not the CWD.
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////api/Database/database.db'
 
 # SQLAlchemy Configs
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
