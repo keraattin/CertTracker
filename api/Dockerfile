@@ -6,6 +6,13 @@ WORKDIR /api
 # Copy Files
 COPY . .
 
+# Install Build Dependencies (required to compile the cryptography wheel
+# on alpine, since prebuilt wheels are not published for musl-based libc)
+RUN apk add --no-cache gcc musl-dev libffi-dev openssl-dev cargo
+
+# Upgrade Pip
+RUN pip install --upgrade pip
+
 # Install Requirements
 RUN pip3 install -r requirements.txt
 
