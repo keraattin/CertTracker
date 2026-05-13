@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+.env
+
+# SQLite & runtime data
+api/Database/
+api/Logs/
+cert-checker/logs/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs (generic)
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/

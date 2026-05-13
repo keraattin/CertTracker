@@ -3,13 +3,13 @@
 
 # Libraries
 ##############################################################################
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request
 
-from .models import DnsRecord
-from .schema import CreateSchema,UpdateSchema
-from Shared.status_codes import OK
+from .schema import CreateSchema, UpdateSchema
+from .service import DnsRecordService
+from Shared.http import handle_errors
+from Shared.status_codes import OK, CREATED
 from Shared.validators import validate_request
-from Cert.models import Cert
 ##############################################################################
 
 
@@ -22,39 +22,43 @@ dns_bp = Blueprint('dns_record_blueprint', __name__)
 # Views
 ##############################################################################
 @dns_bp.route('/', methods=['POST'])
+@handle_errors
 def create():
-    data = request.get_json()   # Get Data
-    # Validate Request
-    errors = validate_request(data=data,schema=CreateSchema)
-    # If any Error Occurs
+    data = request.get_json()
+    errors = validate_request(data=data, schema=CreateSchema)
     if errors:
         return errors
-    return DnsRecord.create(data)
+    return jsonify(DnsRecordService.create(data)), CREATED
+
 
 @dns_bp.route('/<id>', methods=['GET'])
+@handle_errors
 def get(id):
-    return DnsRecord.get(id)
+    return jsonify(DnsRecordService.get(id)), OK
+
 
 @dns_bp.route('/', methods=['GET'])
+@handle_errors
 def get_all():
-    return DnsRecord.get_all()
+    return jsonify(DnsRecordService.list()), OK
+
 
 @dns_bp.route('/<id>', methods=['PUT'])
+@handle_errors
 def update(id):
-    data = request.get_json()   # Get Data
-    # Validate Request
-    errors = validate_request(data=data,schema=UpdateSchema)
+    data = request.get_json()
+    errors = validate_request(data=data, schema=UpdateSchema)
     if errors:
         return errors
-    return DnsRecord.update(id,data)
+    return jsonify(DnsRecordService.update(id, data)), OK
+
 
 @dns_bp.route('/<id>', methods=['DELETE'])
+@handle_errors
 def delete(id):
-    deleted = DnsRecord.delete(id) # Delete the Record
-    # If Successfully Deleted
-    if int(deleted[1]) == int(OK):
-        cert = Cert.query.filter_by(dns_record_id=id).first()
-        if cert:
-            Cert.delete(cert.id)
-    return deleted
+    DnsRecordService.delete(id)
+    return jsonify({
+        "status": "ok",
+        "message": str(id) + " deleted successfully",
+    }), OK
 ##############################################################################
