@@ -5,12 +5,17 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 from app import app
 import logging
+import os
 from Shared.timezone import TZ
 ##############################################################################
 
 ##############################################################################
+# Relative to the working directory (/api in the container). Overridable so
+# the scheduler can also run from somewhere else.
+LOG_FILE = os.environ.get('LOG_FILE') or './Logs/cron.log'
+
 log = logging.getLogger(__name__)
-logging.basicConfig(filename = './Logs/cron.log',
+logging.basicConfig(filename = LOG_FILE,
                     level = logging.INFO,
                     format = '%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 ##############################################################################
@@ -46,10 +51,12 @@ def job():
 
 # Main
 ##############################################################################
-try:
-    scheduler.start()
-except (KeyboardInterrupt, SystemExit):
-    # Not strictly necessary if daemonic mode is enabled
-    # but should be done if possible
-    scheduler.shutdown()
+# Guarded so importing this module does not block on the scheduler loop.
+if __name__ == '__main__':
+    try:
+        scheduler.start()
+    except (KeyboardInterrupt, SystemExit):
+        # Not strictly necessary if daemonic mode is enabled
+        # but should be done if possible
+        scheduler.shutdown()
 ##############################################################################

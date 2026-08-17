@@ -1,10 +1,16 @@
-flask
-SQLAlchemy
-Flask_SQLAlchemy
-dataclasses
-APScheduler
-requests
-pytz
-Flask-Cors
-marshmallow
-cryptography == 37.0.2
+# Pinned so a rebuild always produces the same image. Unpinned versions
+# already broke the app twice: Flask-SQLAlchemy 3.x changed how relative
+# SQLite URIs are resolved, and SQLAlchemy 2.0 removed db.relation().
+#
+# Dropped: "dataclasses" (a Python 3.6 backport that shadows the stdlib
+# module on 3.10) and "requests" (unused since the cert-checker service
+# was embedded).
+Flask == 3.1.3
+Flask-Cors == 6.0.5
+Flask-SQLAlchemy == 3.0.5
+SQLAlchemy == 2.0.52
+APScheduler == 3.11.3
+marshmallow == 3.26.2
+pytz == 2026.3.post1
+cryptography == 45.0.7
+waitress == 3.0.2

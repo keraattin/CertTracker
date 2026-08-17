@@ -9,6 +9,11 @@
 ##############################################################################
 LEN_ID          = 15
 LEN_ID_POSTFIX  = 5
+
+# Seconds to wait for the TLS connect + handshake before giving up. A host
+# that silently drops packets would otherwise block the request, and the
+# whole cron run, forever.
+TLS_TIMEOUT     = 10
 ##############################################################################
 
 # Enums
