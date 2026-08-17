@@ -16,6 +16,9 @@
   - The api returns `days_remaining` and `status` (`valid` / `expiring` / `expired`), so the thresholds are defined once instead of being repeated in the frontend. A certificate with exactly 30 days left used to fall through every branch and render an uncoloured badge.
   - A host that could not be reached during `Check All Certs` is now listed with a cross instead of being dropped from the table entirely.
   - Columns added to a model are applied to an existing database on startup, so upgrading does not require recreating it.
+- Dashboard on the home page ([#15](https://github.com/keraattin/CertTracker/issues/15)):
+  - The home page was an empty container. It now summarizes how many certificates are valid, expiring within 30 days, expired, or failed their last check, and how many tracked DNS records have never been checked at all.
+  - Below the cards, everything that is not plainly valid is listed soonest to expire first, so the page answers "what do I need to do today" without opening the certificates list.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
 - [#1](https://github.com/keraattin/CertTracker/issues/1) Scheduled jobs added. All certificates will be checked everyday at 00:05 UTC
