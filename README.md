@@ -24,27 +24,21 @@ services:
         - "5000:5000"
       volumes:
         - './api/Database:/api/Database'
-    cert-checker:
-      build: ./cert-checker
-      ports:
-        - "5001:5001"
-      volumes:
-        - './cert-checker/logs:/cert-checker/logs'
+        - './api/Logs:/api/Logs'
     frontend:
       build: ./frontend
       ports:
         - "8080:80"
 ```
 
-- Api service works on port 5000
-- Certificate Checker service works on port 5001
+- Api service works on port 5000 (includes the in-process certificate fetcher)
 - Frontend service works on 8080
 
 ### Step 3 : Change the secret keys (if you want to):
 
 Although the secret key is not important for this project at the moment but you may still want to change it. 
 
-You can find secret key configs in `/api/Dockerfile` and `/cert-checker/Dockerfile`
+You can find the secret key config in `/api/Dockerfile`
 
 ```
 ENV SECRET_KEY "thisistestsecretkey"

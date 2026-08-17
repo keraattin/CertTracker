@@ -4,32 +4,20 @@
 # Libraries
 ##############################################################################
 from datetime import datetime
-import json
-
-import requests
 
 from DnsRecord.models import DnsRecord
 from .models import Cert
-from Shared.exceptions import (
-    NotFoundError, ConflictError, ExternalServiceError
-)
+from Shared.cert_checker import fetch_certificate
+from Shared.exceptions import NotFoundError, ConflictError
 from Shared.timezone import TZ
-##############################################################################
-
-
-# Module Configuration
-##############################################################################
-CERT_CHECKER_URL = "http://cert-checker:5001/api/cert_check"
-CERT_CHECKER_HEADERS = {"Content-Type": "application/json"}
-TIME_FORMAT = '%a, %d %b %Y %H:%M:%S %Z'  # Flask jsonify default for datetime
 ##############################################################################
 
 
 # Cert Service
 ##############################################################################
-# Business rules for SSL/TLS certificate records, including the orchestration
-# that calls the external cert-checker service. Routes and the cron worker
-# both go through this class so the same logic runs in both contexts.
+# Business rules for SSL/TLS certificate records. Cert fetching now happens
+# in-process via Shared.cert_checker; routes and the cron worker share the
+# same code path.
 ##############################################################################
 class CertService:
 
@@ -47,33 +35,15 @@ class CertService:
         if dns_record is None:
             raise NotFoundError(str(dns_record_id) + " not found")
 
-        payload = json.dumps({
-            "dns": str(dns_record.dns),
-            "ssl_port": int(dns_record.ssl_port),
-        })
-
-        response = requests.request(
-            "POST", CERT_CHECKER_URL,
-            headers=CERT_CHECKER_HEADERS, data=payload,
+        validity = fetch_certificate(
+            dns=str(dns_record.dns),
+            ssl_port=int(dns_record.ssl_port),
         )
 
-        if response.status_code != 200:
-            body = response.json() if response.content else {}
-            raise ExternalServiceError(
-                message=body.get("message", "cert-checker error"),
-                details=body or None,
-                status_code=response.status_code,
-            )
-
-        cert_payload = response.json()
         cert_data = {
             "dns_record_id": dns_record.id,
-            "not_after": datetime.strptime(
-                str(cert_payload["not_after"]), TIME_FORMAT
-            ),
-            "not_before": datetime.strptime(
-                str(cert_payload["not_before"]), TIME_FORMAT
-            ),
+            "not_after": validity["not_after"],
+            "not_before": validity["not_before"],
             "last_update": datetime.now(TZ),
         }
 
