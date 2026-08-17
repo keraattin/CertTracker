@@ -61,6 +61,12 @@
                   </span>
                 </th>
                 <th>
+                  Issuer
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Authority that issued the certificate">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
                   Not Before
                   <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Not valid before this date">
                     <i class="bi bi-info-circle"></i>
@@ -80,7 +86,7 @@
                 </th>
                 <th>
                   Last Update
-                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Last database update">
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Last time the certificate was fetched successfully">
                     <i class="bi bi-info-circle"></i>
                   </span>
                 </th>
@@ -112,6 +118,63 @@
                 </table>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detailsModalLabel">Certificate Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-sm">
+              <tbody>
+                <tr>
+                  <th scope="row">DNS</th>
+                  <td id="detailsDns"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Subject</th>
+                  <td id="detailsSubject"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Issuer</th>
+                  <td id="detailsIssuer"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Alternative Names</th>
+                  <td id="detailsSans"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Serial Number</th>
+                  <td id="detailsSerial"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Signature Algorithm</th>
+                  <td id="detailsSignature"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Self Signed</th>
+                  <td id="detailsSelfSigned"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Last Check</th>
+                  <td id="detailsLastCheck"></td>
+                </tr>
+                <tr>
+                  <th scope="row">Last Error</th>
+                  <td id="detailsLastError"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>

@@ -81,6 +81,10 @@ docker-compose up --build
 
 ![Check Cert Cert](/docs/images/CheckCertCert.png "Check Cert Cert")
 
+- The `Details` button shows the subject, issuer, alternative names, serial number and signature algorithm of the certificate, along with the outcome of the last check
+
+- If a check fails, the row keeps the last certificate that could be fetched and is marked `CHECK FAILED`. Hover the badge to see the error
+
 
 ### Check All Certificates
 - Go to the `Certificates` Page

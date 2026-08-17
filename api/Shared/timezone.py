@@ -14,6 +14,10 @@ import os
 # Timezone the scheduler runs its daily job in. Falls back to UTC so the
 # app also starts outside of Docker, where TIMEZONE is not exported.
 TZ = pytz.timezone(os.environ.get('TIMEZONE') or 'Etc/UTC')
+
+# Attached to datetimes read back from SQLite, which stores them without
+# one.
+UTC = timezone.utc
 ##############################################################################
 
 

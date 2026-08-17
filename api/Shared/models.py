@@ -4,6 +4,7 @@
 # Libraries
 ##############################################################################
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import IntegrityError
 from dataclasses import dataclass, asdict
 import os
@@ -15,6 +16,34 @@ from .exceptions import NotFoundError, ConflictError
 # Database Object
 ##############################################################################
 db = SQLAlchemy()
+##############################################################################
+
+# Schema Sync
+##############################################################################
+# db.create_all() creates missing tables but never touches existing ones,
+# so a column added to a model stays invisible to an installation that
+# already has a database. SQLite can add a nullable column in place,
+# which covers everything this project needs: the schema only grows.
+#
+# Table and column names come from the models, never from user input.
+##############################################################################
+def ensure_columns():
+    inspector = inspect(db.engine)
+    tables = inspector.get_table_names()
+
+    for table in db.metadata.tables.values():
+        if table.name not in tables:
+            continue
+        known = [column["name"] for column in inspector.get_columns(table.name)]
+        for column in table.columns:
+            if column.name in known:
+                continue
+            column_type = column.type.compile(db.engine.dialect)
+            db.session.execute(text(
+                "ALTER TABLE " + table.name +
+                " ADD COLUMN " + column.name + " " + column_type
+            ))
+    db.session.commit()
 ##############################################################################
 
 # Base Class

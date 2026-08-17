@@ -6,7 +6,7 @@ from flask import Flask, jsonify
 import os
 from flask_cors import CORS
 
-from Shared.models import db
+from Shared.models import db, ensure_columns
 from Shared.status_codes import OK
 from DnsRecord.views import dns_bp
 from Cert.views import crt_bp
@@ -42,6 +42,8 @@ db.init_app(app)
 # Create Database
 with app.app_context():
     db.create_all()
+    # Adds columns that were introduced after the database was created.
+    ensure_columns()
 
 # CORS
 CORS(app)

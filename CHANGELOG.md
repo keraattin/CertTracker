@@ -10,6 +10,12 @@
   - Added a `/health` endpoint and a compose healthcheck.
   - `TIMEZONE` defaults to `Etc/UTC` and the database path is configurable via `DATABASE_URI`, so the app also runs outside the container.
   - Raised the `dns` column to 253 characters to match the validation regex, and made the regex patterns raw strings.
+- Certificate details and failed check visibility ([#11](https://github.com/keraattin/CertTracker/issues/11)):
+  - Certificates now record their issuer, subject, alternative names, serial number, signature algorithm and whether they are self-signed. A `Details` button on the certificates page shows all of it.
+  - A failed check no longer leaves the previous certificate looking healthy. The row keeps the last certificate that could be fetched and is marked `CHECK FAILED`, with the error behind the badge.
+  - The api returns `days_remaining` and `status` (`valid` / `expiring` / `expired`), so the thresholds are defined once instead of being repeated in the frontend. A certificate with exactly 30 days left used to fall through every branch and render an uncoloured badge.
+  - A host that could not be reached during `Check All Certs` is now listed with a cross instead of being dropped from the table entirely.
+  - Columns added to a model are applied to an existing database on startup, so upgrading does not require recreating it.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
 - [#1](https://github.com/keraattin/CertTracker/issues/1) Scheduled jobs added. All certificates will be checked everyday at 00:05 UTC
