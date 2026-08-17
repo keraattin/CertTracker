@@ -7,7 +7,9 @@
 
 # Values
 ##############################################################################
-LEN_DNS = 64
+# 253 is the maximum length of a fully qualified domain name, and matches
+# the upper bound of the dns regex in schema.py.
+LEN_DNS = 253
 ##############################################################################
 
 # Enums

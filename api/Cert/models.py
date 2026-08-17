@@ -30,7 +30,7 @@ class Cert(Base):
     dns_record_id = db.Column(
         db.String(LEN_ID), db.ForeignKey('dns_record.id'), unique=True
     )
-    dns_record = db.relation(
+    dns_record = db.relationship(
         "DnsRecord", foreign_keys=[dns_record_id]
     )
     not_after = db.Column(

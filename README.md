@@ -31,18 +31,21 @@ services:
         - "8080:80"
 ```
 
-- Api service works on port 5000 (includes the in-process certificate fetcher)
+- Api service works on port 5000 (includes the in-process certificate fetcher). Its liveness can be checked at `/health`
 - Frontend service works on 8080
 
-### Step 3 : Change the secret keys (if you want to):
+### Step 3 : Change the environment variables (if you want to):
 
-Although the secret key is not important for this project at the moment but you may still want to change it. 
+You can find them in `/api/Dockerfile`
 
-You can find the secret key config in `/api/Dockerfile`
-
-```
-ENV SECRET_KEY "thisistestsecretkey"
-```
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PORT` | `5000` | Port the api listens on |
+| `DEBUG` | `False` | Flask debug mode, only used when running `app.py` directly |
+| `SECRET_KEY` | `thisistestsecretkey` | Not important for this project at the moment, but you may still want to change it |
+| `TIMEZONE` | `Etc/UTC` | Timezone the daily job runs in. Stored datetimes are always UTC |
+| `DATABASE_URI` | `sqlite:////api/Database/database.db` | Overridable so the app can also run outside the container |
+| `LOG_FILE` | `./Logs/cron.log` | Log file of the daily job |
 
 ### Step 4 : Build the containers
 
@@ -98,6 +101,7 @@ docker-compose up --build
 - [X] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
 - [ ] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
 - [ ] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
+- [ ] [Permit upload of certificate and fetching SAML certificates from public SAML endpoints]( https://github.com/keraattin/CertTracker/issues/5)
 
 ## License
 
