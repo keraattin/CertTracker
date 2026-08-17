@@ -6,6 +6,12 @@ services:
       volumes:
         - './api/Database:/api/Database'
         - './api/Logs:/api/Logs'
+      healthcheck:
+        test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+        interval: 30s
+        timeout: 5s
+        retries: 3
+        start_period: 10s
     frontend:
       build: ./frontend
       ports:

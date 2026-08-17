@@ -9,6 +9,7 @@ import ssl
 from cryptography import x509
 
 from .exceptions import ExternalServiceError
+from .restrictions import TLS_TIMEOUT
 ##############################################################################
 
 
@@ -29,6 +30,9 @@ def fetch_certificate(dns, ssl_port):
 
     try:
         with ctx.wrap_socket(socket.socket(), server_hostname=dns) as sock:
+            # Set before connect() so the timeout covers both the TCP
+            # connect and the TLS handshake.
+            sock.settimeout(TLS_TIMEOUT)
             sock.connect((dns, ssl_port))
             der_data = sock.getpeercert(True)
     except Exception as e:
@@ -40,7 +44,10 @@ def fetch_certificate(dns, ssl_port):
     pem_data = ssl.DER_cert_to_PEM_cert(der_data)
     cert = x509.load_pem_x509_certificate(pem_data.encode())
 
+    # The *_utc properties return timezone-aware UTC datetimes. The older
+    # not_valid_before / not_valid_after pair returns naive ones and is
+    # deprecated since cryptography 42.
     return {
-        "not_before": cert.not_valid_before,
-        "not_after": cert.not_valid_after,
+        "not_before": cert.not_valid_before_utc,
+        "not_after": cert.not_valid_after_utc,
     }

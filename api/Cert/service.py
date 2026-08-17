@@ -3,13 +3,11 @@
 
 # Libraries
 ##############################################################################
-from datetime import datetime
-
 from DnsRecord.models import DnsRecord
 from .models import Cert
 from Shared.cert_checker import fetch_certificate
 from Shared.exceptions import NotFoundError, ConflictError
-from Shared.timezone import TZ
+from Shared.timezone import utc_now
 ##############################################################################
 
 
@@ -44,7 +42,7 @@ class CertService:
             "dns_record_id": dns_record.id,
             "not_after": validity["not_after"],
             "not_before": validity["not_before"],
-            "last_update": datetime.now(TZ),
+            "last_update": utc_now(),
         }
 
         try:
