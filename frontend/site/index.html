@@ -16,7 +16,7 @@
 
     <title>Cert Tracker</title>
   </head>
-  <body>
+  <body onload="getDashboard()">
     <header>
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">Cert Tracker<i class="bi bi-shield-check"></i></a>
@@ -35,14 +35,110 @@
         </div>
       </nav>
     </header>
-    <div class="container">
-      <div class="row">
+    <div class="container-fluid">
+      <!-- Summary Cards -->
+      <div class="row mt-3">
+        <div class="col-sm-6 col-lg-3 mb-3">
+          <a href="/certificates.html" class="text-decoration-none">
+            <div class="card text-white bg-success h-100">
+              <div class="card-body">
+                <h2 class="card-title" id="summaryValid">-</h2>
+                <p class="card-text">Valid</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+          <a href="/certificates.html" class="text-decoration-none">
+            <div class="card text-dark bg-warning h-100">
+              <div class="card-body">
+                <h2 class="card-title" id="summaryExpiring">-</h2>
+                <p class="card-text">Expiring within 30 days</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+          <a href="/certificates.html" class="text-decoration-none">
+            <div class="card text-white bg-danger h-100">
+              <div class="card-body">
+                <h2 class="card-title" id="summaryExpired">-</h2>
+                <p class="card-text">Expired</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-3 mb-3">
+          <a href="/certificates.html" class="text-decoration-none">
+            <div class="card text-white bg-dark h-100">
+              <div class="card-body">
+                <h2 class="card-title" id="summaryFailed">-</h2>
+                <p class="card-text">Last check failed</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
 
+      <div class="row">
+        <p class="text-muted" id="summaryTracked"></p>
+      </div>
+
+      <!-- Needs Attention -->
+      <div class="row">
+        <div class="table-responsive-sm">
+          <p class="text-success" id="attentionEmpty" hidden>Nothing needs attention right now.</p>
+          <table id="attentionTable" class="table table-hover table-striped table-sm caption-top" hidden>
+            <caption>Certificates that expire soon, already expired, or could not be checked</caption>
+            <thead class="table-dark">
+              <tr>
+                <th>
+                  DNS
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="DNS record or Ip adress">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
+                  SSL Port
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="SSL port of target">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
+                  Not After
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Not valid after this date">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
+                  Remaining Day
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Not valid after day/s">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
+                  Last Check
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Last check attempt, successful or not">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Sweet Alert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Main JS -->
+    <script src="js/main.js"></script>
 
   </body>
 </html>

@@ -59,6 +59,8 @@ docker-compose up --build
 
 - Go to the `http://localhost:8080` (if you didn't change the frontend port)
 
+- The home page summarizes how many certificates are valid, expiring, expired or failed their last check, and lists the ones that need attention
+
 ### Create DNS record
 - Go to the `DnsRecords` Page
 
