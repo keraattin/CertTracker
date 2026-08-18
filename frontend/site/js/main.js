@@ -117,8 +117,8 @@ async function getDashboard(){
   /* Both lists are fetched: the certificates carry the status, the dns
      records tell how many of them have never been checked at all */
   await Promise.all([
-      fetch("http://localhost:5000/api/cert", requestOptions),
-      fetch("http://localhost:5000/api/dns", requestOptions)
+      fetch("/api/cert", requestOptions),
+      fetch("/api/dns", requestOptions)
     ])
     .then(responses => Promise.all(responses.map(response => response.json())))
     .then(([certs, dnsRecords]) => {

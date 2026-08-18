@@ -144,6 +144,38 @@ def test_datetime_script_is_loaded_first(page):
     assert scripts.index("datetime.js") < min(scripts.index(n) for n in others)
 
 
+def test_the_api_is_called_on_the_same_origin():
+    # nginx proxies /api to the api service. An absolute address here
+    # would pin the deployment to whatever host was hardcoded, which is
+    # exactly what this replaced.
+    offenders = [
+        (name, match.group(0))
+        for name in SCRIPTS
+        for match in re.finditer(r"https?://[^\"'\s]+", read(name))
+    ]
+    assert offenders == []
+
+
+def test_every_api_call_is_a_relative_path():
+    calls = [
+        match.group(1)
+        for name in SCRIPTS
+        for match in re.finditer(r"""["'](/api[^"']*)["']""", read(name))
+    ]
+    assert calls, "the frontend should call the api somewhere"
+    assert all(call.startswith("/api") for call in calls)
+
+
+def test_nginx_serves_the_api_under_the_same_host():
+    conf = os.path.join(os.path.dirname(SITE), "nginx.conf")
+    with open(conf, encoding="utf-8") as handle:
+        text = handle.read()
+    assert "location /api" in text
+    assert "proxy_pass http://api:5000" in text
+    # The health endpoint sits outside /api and needs its own rule.
+    assert "location /health" in text
+
+
 def test_every_element_id_the_dashboard_uses_exists():
     page = read_page("index.html")
     wanted = set(re.findall(
