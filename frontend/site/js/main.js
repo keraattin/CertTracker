@@ -70,7 +70,7 @@ function writeAttentionTable(certs){
     sslPortElement.textContent = element.dns_record.ssl_port;
 
     const notAfterElement = document.createElement("td");
-    notAfterElement.textContent = element.not_after;
+    writeLocalTime(notAfterElement, element.not_after);
 
     const remainingDayElement = document.createElement("td");
     const diffDayBadge = document.createElement("span");
@@ -83,7 +83,7 @@ function writeAttentionTable(certs){
     remainingDayElement.appendChild(diffDayBadge);
 
     const lastCheckElement = document.createElement("td");
-    lastCheckElement.textContent = element.last_check;
+    writeLocalTime(lastCheckElement, element.last_check);
     if (element.last_check_status === 'failed'){
       const failedBadge = document.createElement("span");
       failedBadge.textContent = 'CHECK FAILED';
@@ -111,6 +111,8 @@ async function getDashboard(){
       mode: 'cors',
       redirect: 'follow'
   };
+
+  writeLocalTimezone();
 
   /* Both lists are fetched: the certificates carry the status, the dns
      records tell how many of them have never been checked at all */

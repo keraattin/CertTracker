@@ -22,7 +22,7 @@ function showCertDetails(cert){
   document.getElementById('detailsSerial').textContent = detailValue(cert.serial_number);
   document.getElementById('detailsSignature').textContent = detailValue(cert.signature_algorithm);
   document.getElementById('detailsSelfSigned').textContent = detailValue(cert.self_signed);
-  document.getElementById('detailsLastCheck').textContent = detailValue(cert.last_check);
+  document.getElementById('detailsLastCheck').textContent = toLocalTime(cert.last_check);
   document.getElementById('detailsLastError').textContent = detailValue(cert.last_error);
 
   $('#detailsModal').modal('toggle');   // Toggle the Modal
@@ -39,6 +39,8 @@ async function getCerts(){
 
   const table = document.getElementById("certsTable");
   const tableBody = table.querySelector("tbody");
+
+  writeLocalTimezone();
 
   await fetch(url, requestOptions)
       .then(response => response.json())
@@ -63,10 +65,10 @@ async function getCerts(){
             issuerElement.textContent = detailValue(element.issuer);
 
             const notBeforeElement = document.createElement("td");
-            notBeforeElement.textContent = element.not_before;
+            writeLocalTime(notBeforeElement, element.not_before);
 
             const notAfterElement = document.createElement("td");
-            notAfterElement.textContent = element.not_after;
+            writeLocalTime(notAfterElement, element.not_after);
 
             /* The remaining days and the status come from the api, so the
                thresholds live in one place instead of being repeated here */
@@ -92,7 +94,7 @@ async function getCerts(){
             remainingDayElement.appendChild(diffDayBadge);
 
             const lastUpdateElement = document.createElement("td");
-            lastUpdateElement.textContent = element.last_update;
+            writeLocalTime(lastUpdateElement, element.last_update);
             /* The certificate above is the last one that could be fetched.
                Without this badge a host that stopped answering would keep
                looking perfectly healthy */

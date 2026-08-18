@@ -23,6 +23,10 @@
   - The daily job now sends a summary mail after it checks the certificates. Configured through `SMTP_HOST`, `MAIL_FROM`, `MAIL_TO` and friends; notifications stay off until those are set, so nothing changes for an installation that ignores them.
   - `NOTIFY_DAYS` (default `30,14,7,1`) decides when a mail goes out. Each certificate is reported once per threshold and once more when it actually expires, instead of every morning. Renewing a certificate starts its thresholds over.
   - `POST /api/notification/run` runs the same pass on demand, to verify the smtp settings without waiting for the scheduled run.
+- Local time in the frontend ([#3](https://github.com/keraattin/CertTracker/issues/3)):
+  - Dates were printed exactly as the api sent them, which is UTC, so a certificate expiring at `23:59:59 GMT` read as the wrong day for anyone east of London. They are now rendered in the timezone of the browser, and each table says which timezone that is.
+  - Hovering a date shows the original UTC value the api sent, so the converted value stays verifiable.
+  - Mail notifications keep writing UTC and label it as such: the recipient's timezone is not knowable from the server.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
 - [#1](https://github.com/keraattin/CertTracker/issues/1) Scheduled jobs added. All certificates will be checked everyday at 00:05 UTC

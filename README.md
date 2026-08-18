@@ -61,6 +61,8 @@ docker-compose up --build
 
 - The home page summarizes how many certificates are valid, expiring, expired or failed their last check, and lists the ones that need attention
 
+- All dates are stored in UTC and shown in the timezone of your browser. Hover a date to see the UTC value behind it
+
 ### Create DNS record
 - Go to the `DnsRecords` Page
 
@@ -128,7 +130,7 @@ curl -X POST http://localhost:5000/api/notification/run
 
 - [X] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
 - [X] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
-- [ ] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
+- [X] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
 - [ ] [Permit upload of certificate and fetching SAML certificates from public SAML endpoints]( https://github.com/keraattin/CertTracker/issues/5)
 
 ## License
