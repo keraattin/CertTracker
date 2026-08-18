@@ -30,7 +30,7 @@ function showCertDetails(cert){
 
 /* Get Certificate Records & Write to the Table */
 async function getCerts(){
-  const url = "http://localhost:5000/api/cert"
+  const url = "/api/cert"
   const requestOptions = {
       method: 'GET',
       mode: 'cors',
@@ -152,7 +152,7 @@ async function getCerts(){
 }
 
 async function certCheck(id){
-  const url = "http://localhost:5000/api/cert/cert_check/"+id
+  const url = "/api/cert/cert_check/"+id
   
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -191,7 +191,7 @@ async function certCheck(id){
 }
 
 async function checkAllCerts(){
-  const getUrl = "http://localhost:5000/api/dns"
+  const getUrl = "/api/dns"
   const getRequestOptions = {
       method: 'GET',
       mode: 'cors',
@@ -222,7 +222,7 @@ async function checkAllCerts(){
 
     /* Looping over DNS Records & Checking Certificates */
    for(const record of dnsArr){
-    const url = "http://localhost:5000/api/cert/cert_check/"+record.id
+    const url = "/api/cert/cert_check/"+record.id
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 

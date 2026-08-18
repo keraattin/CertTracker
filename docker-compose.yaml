@@ -27,3 +27,8 @@ services:
       build: ./frontend
       ports:
         - "8080:80"
+      # nginx resolves the api hostname once, when it starts, so it must
+      # not come up before the api is answering.
+      depends_on:
+        api:
+          condition: service_healthy

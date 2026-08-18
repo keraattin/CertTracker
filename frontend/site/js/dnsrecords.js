@@ -1,6 +1,6 @@
 /* Get DNS Records & Write to the Table */
 async function getDnsRecords(){
-    const url = "http://localhost:5000/api/dns"
+    const url = "/api/dns"
     const requestOptions = {
         method: 'GET',
         mode: 'cors',
@@ -127,7 +127,7 @@ async function createDnsRecord(){
       text: 'Please do not leave blank fields.',
     })
   } else {
-    const url = "http://localhost:5000/api/dns"
+    const url = "/api/dns"
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -183,7 +183,7 @@ async function createDnsRecord(){
 }
 
 async function deleteDnsRecord(id){
-  const url = "http://localhost:5000/api/dns/"+id
+  const url = "/api/dns/"+id
   
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -240,7 +240,7 @@ async function updateDnsRecord(id){
       text: 'Please do not leave blank fields.',
     })
   } else {
-    const url = "http://localhost:5000/api/dns/"+id
+    const url = "/api/dns/"+id
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -296,7 +296,7 @@ async function updateDnsRecord(id){
 }
 
 async function certCheck(id){
-  const url = "http://localhost:5000/api/cert/cert_check/"+id
+  const url = "/api/cert/cert_check/"+id
   
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");

@@ -32,7 +32,7 @@ services:
 ```
 
 - Api service works on port 5000 (includes the in-process certificate fetcher). Its liveness can be checked at `/health`
-- Frontend service works on 8080
+- Frontend service works on 8080 and proxies `/api` through to the api service, so the frontend carries no api address of its own and the project can be deployed anywhere
 
 ### Step 3 : Change the environment variables (if you want to):
 
@@ -118,7 +118,7 @@ Once configured, the daily job sends one summary mail right after it checks the 
 To verify the settings without waiting for the scheduled run:
 
 ```
-curl -X POST http://localhost:5000/api/notification/run
+curl -X POST http://localhost:8080/api/notification/run
 ```
 
 ## Development

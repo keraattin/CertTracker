@@ -27,11 +27,15 @@
   - Dates were printed exactly as the api sent them, which is UTC, so a certificate expiring at `23:59:59 GMT` read as the wrong day for anyone east of London. They are now rendered in the timezone of the browser, and each table says which timezone that is.
   - Hovering a date shows the original UTC value the api sent, so the converted value stays verifiable.
   - Mail notifications keep writing UTC and label it as such: the recipient's timezone is not knowable from the server.
-- Test suite and CI ([#17](https://github.com/keraattin/CertTracker/issues/17)):
+- Test suite and CI ([#19](https://github.com/keraattin/CertTracker/issues/19)):
   - 64 tests covering the routes, the expiry thresholds, the check failure path, the notification thresholds, the schema sync and the frontend scripts.
   - No network access and no docker required. The suite generates its own certificate and serves it over TLS on localhost, so the fetcher is tested against known dates and a known issuer instead of whatever a public host serves today. A small smtp server does the same for the notifications, and a socket that accepts a connection and then says nothing proves the TLS timeout works.
   - The frontend scripts run in an embedded javascript engine, so a syntax error fails the build rather than appearing as a blank page.
   - GitHub Actions runs the tests and a `docker compose build` on every push and pull request, on the same Python version as the image.
+- Same origin frontend (ISSUE_REF_PENDING):
+  - The api address was written into the frontend javascript in eleven places as `http://localhost:5000`, so the project only ever worked on the machine it was built on. nginx now proxies `/api` to the api service and every call is a relative path.
+  - A test fails the build if an absolute address finds its way back into the scripts.
+  - The frontend waits for the api healthcheck before starting, since nginx resolves the api hostname once, at startup.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
 - [#1](https://github.com/keraattin/CertTracker/issues/1) Scheduled jobs added. All certificates will be checked everyday at 00:05 UTC
