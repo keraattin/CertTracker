@@ -1,0 +1,9 @@
+# Test only. Not installed into the image, which runs on
+# requirements.txt alone.
+-r requirements.txt
+pytest == 8.3.5
+# Embedded javascript engine, so the frontend scripts are checked for
+# syntax errors and the datetime helpers are actually run. 0.6 or newer:
+# the engine in 0.5 predates const, arrow functions and for...of, which
+# the frontend uses throughout.
+dukpy == 0.6.0

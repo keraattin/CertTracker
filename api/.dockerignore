@@ -1,0 +1,13 @@
+# The image runs on requirements.txt alone; tests and their tooling do
+# not belong in it.
+tests/
+pytest.ini
+requirements-dev.txt
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime data, mounted as volumes instead
+Database/
+Logs/
