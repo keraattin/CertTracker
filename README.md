@@ -121,6 +121,18 @@ To verify the settings without waiting for the scheduled run:
 curl -X POST http://localhost:5000/api/notification/run
 ```
 
+## Development
+### Running the tests
+```
+pip install -r api/requirements-dev.txt
+cd api
+pytest
+```
+
+The suite needs no network access and no docker: it generates its own certificate and serves it over TLS on localhost, and runs a small smtp server in the same way. The frontend scripts are executed in an embedded javascript engine, so a syntax error fails the build instead of showing up as a blank page.
+
+Both the tests and a `docker compose build` run on every push and pull request.
+
 ## Build With
 - Python
 - Bootstrap
