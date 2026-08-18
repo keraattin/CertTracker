@@ -33,6 +33,7 @@ def job():
     with app.app_context():
         from DnsRecord.models import DnsRecord
         from Cert.service import CertService
+        from Notification.service import NotificationService
         dns_records = DnsRecord.query.all()
         for dns_record in dns_records:
             try:
@@ -42,9 +43,15 @@ def job():
                 )
             except Exception as e:
                 log.error(
-                    "failed to check %s:%s — %s",
+                    "failed to check %s:%s - %s",
                     dns_record.dns, dns_record.ssl_port, e,
                 )
+        # Runs on the results of the checks above, so a certificate that
+        # was renewed this morning is not reported as expiring.
+        try:
+            log.info("notification: %s", NotificationService.run())
+        except Exception as e:
+            log.error("failed to send notifications - %s", e)
     log.info("job finished")
 ##############################################################################
 

@@ -97,6 +97,28 @@ docker-compose up --build
 
 ![Check All Certs](/docs/images/CheckAllCerts.png "Check All Certs")
 
+### Mail Notifications
+Notifications are off until the smtp settings are filled in. You can set them in the `docker-compose.yaml` file, where they are listed as commented out examples.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `SMTP_HOST` | empty | Smtp server. Leaving it empty keeps notifications off |
+| `SMTP_PORT` | `587` | Smtp port |
+| `SMTP_USER` | empty | Leave empty for a relay that accepts unauthenticated mail |
+| `SMTP_PASSWORD` | empty | Password of `SMTP_USER` |
+| `SMTP_TLS` | `True` | Whether to start TLS after connecting |
+| `MAIL_FROM` | empty | Sender address |
+| `MAIL_TO` | empty | Recipients, separated by commas |
+| `NOTIFY_DAYS` | `30,14,7,1` | Days before expiry a mail goes out |
+
+Once configured, the daily job sends one summary mail right after it checks the certificates. A certificate produces at most one mail per threshold, plus one more when it actually expires, so a certificate that is about to run out does not fill your inbox every morning. Renewing it starts the thresholds over.
+
+To verify the settings without waiting for the scheduled run:
+
+```
+curl -X POST http://localhost:5000/api/notification/run
+```
+
 ## Build With
 - Python
 - Bootstrap
@@ -105,7 +127,7 @@ docker-compose up --build
 ## Roadmap
 
 - [X] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
-- [ ] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
+- [X] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
 - [ ] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
 - [ ] [Permit upload of certificate and fetching SAML certificates from public SAML endpoints]( https://github.com/keraattin/CertTracker/issues/5)
 

@@ -39,6 +39,7 @@ class Cert(Base):
     last_check          : datetime
     last_check_status   : str
     last_error          : str
+    notified_days       : int
 
     id = db.Column(
         db.String(LEN_ID), primary_key=True
@@ -88,6 +89,12 @@ class Cert(Base):
     )
     last_error = db.Column(
         db.String(LEN_ERROR)
+    )
+    # Expiry threshold this certificate was last mailed about, so the
+    # daily job does not report the same one again every morning. Reset
+    # when the certificate is renewed.
+    notified_days = db.Column(
+        db.Integer
     )
 
     @classmethod

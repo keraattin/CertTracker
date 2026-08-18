@@ -48,7 +48,7 @@ def _subject_alt_names(cert):
 # certificate, and returns the validity window as datetime objects.
 #
 # TLS verification is intentionally disabled so that expired or
-# self-signed certificates can still be inspected — the whole point of
+# self-signed certificates can still be inspected: the whole point of
 # this tool is to track such certificates.
 ##############################################################################
 def fetch_certificate(dns, ssl_port):
