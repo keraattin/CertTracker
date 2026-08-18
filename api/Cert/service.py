@@ -11,7 +11,7 @@ from .restrictions import (
 )
 from Shared.cert_checker import fetch_certificate
 from Shared.exceptions import NotFoundError, ConflictError, ExternalServiceError
-from Shared.timezone import UTC, utc_now
+from Shared.timezone import as_utc, utc_now
 ##############################################################################
 
 
@@ -74,6 +74,10 @@ class CertService:
                 # Race: the conflicting row vanished between create attempt
                 # and lookup. Re-raise as a generic 500-style error.
                 raise
+            # A renewed certificate starts over: the threshold it was
+            # already mailed about says nothing about the new expiry date.
+            if as_utc(existing.not_after) != validity["not_after"]:
+                cert_data["notified_days"] = None
             return CertService._with_status(Cert.update(existing.id, cert_data))
 
     # Only a record that was fetched successfully at least once has a row
@@ -100,12 +104,7 @@ class CertService:
         if not_after is None:
             return cert
 
-        # Rows read back from SQLite carry no timezone, and every datetime
-        # this project stores is UTC.
-        if not_after.tzinfo is None:
-            not_after = not_after.replace(tzinfo=UTC)
-
-        days_remaining = (not_after - utc_now()).days
+        days_remaining = (as_utc(not_after) - utc_now()).days
         if days_remaining < 0:
             status = STATUS_EXPIRED
         elif days_remaining <= DAYS_EXPIRING:

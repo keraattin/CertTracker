@@ -29,4 +29,13 @@ UTC = timezone.utc
 # comparable. Converting to the user's local time is the frontend's job.
 def utc_now():
     return datetime.now(timezone.utc)
+
+
+# SQLite hands datetimes back without a timezone. Attach UTC before
+# comparing or subtracting, otherwise the naive value silently fails to
+# compare equal to an aware one.
+def as_utc(value):
+    if value is not None and value.tzinfo is None:
+        return value.replace(tzinfo=UTC)
+    return value
 ##############################################################################

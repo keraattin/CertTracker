@@ -10,6 +10,7 @@ from Shared.models import db, ensure_columns
 from Shared.status_codes import OK
 from DnsRecord.views import dns_bp
 from Cert.views import crt_bp
+from Notification.views import notification_bp
 ##############################################################################
 
 
@@ -59,6 +60,7 @@ app.url_map.strict_slashes = False
 ##############################################################################
 app.register_blueprint(dns_bp, url_prefix='/api/dns')
 app.register_blueprint(crt_bp, url_prefix='/api/cert')
+app.register_blueprint(notification_bp, url_prefix='/api/notification')
 ##############################################################################
 
 # Health Check
