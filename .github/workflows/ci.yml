@@ -42,19 +42,22 @@ jobs:
       # An entrypoint carrying CRLF line endings built perfectly and then
       # died at startup, the carriage return having become part of the
       # module name waitress was asked to import.
+      # Addressed as 127.0.0.1 throughout: localhost resolves to ::1
+      # first on some hosts, and published ports are not always bound on
+      # IPv6, which fails in a way that looks like the app is broken.
       - name: Start the stack and check it answers
         run: |
-          docker compose up -d
-          for i in $(seq 1 30); do
-            if curl -fsS http://localhost:8080/health >/dev/null 2>&1; then break; fi
-            sleep 2
-          done
-          curl -fsS http://localhost:8080/health
-          curl -fsS http://localhost:8080/api/dns
+          docker compose up -d --wait
+          docker compose ps
+          curl -fsS http://127.0.0.1:8080/health
+          curl -fsS http://127.0.0.1:8080/api/dns
+          curl -fsS http://127.0.0.1:5000/health
 
-      - name: Show the logs if it did not
+      - name: Show what happened if it did not
         if: failure()
-        run: docker compose logs
+        run: |
+          docker compose ps -a
+          docker compose logs
 
       - name: Stop the stack
         if: always()

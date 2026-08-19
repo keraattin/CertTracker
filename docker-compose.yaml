@@ -17,8 +17,11 @@ services:
       #   MAIL_FROM: "certtracker@example.com"
       #   MAIL_TO: "ops@example.com,oncall@example.com"
       #   NOTIFY_DAYS: "30,14,7,1"
+      # Addressed as 127.0.0.1 rather than localhost: the server binds
+      # 0.0.0.0, which is IPv4 only, while localhost resolves to ::1
+      # first and would be refused.
       healthcheck:
-        test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+        test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')"]
         interval: 30s
         timeout: 5s
         retries: 3

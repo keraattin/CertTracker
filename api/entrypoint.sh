@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Create the schema before anything serves. Both processes below import
+# app.py, which calls db.create_all(); against an empty database the two
+# of them race, and the loser dies with "table already exists". Doing it
+# once up front leaves them nothing to race over.
+python3 -c "import app"
+
 # Start the first(autorun) process
 python3 autorun.py &
 
