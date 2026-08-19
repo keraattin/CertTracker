@@ -37,8 +37,10 @@
   - A test fails the build if an absolute address finds its way back into the scripts.
   - The frontend waits for the api healthcheck before starting, since nginx resolves the api hostname once, at startup.
 - Fixes found by running the stack for real (ISSUE_REF_PENDING):
+  - The api could fail to start on a fresh installation, and did so about half the time. `entrypoint.sh` starts the scheduler and the web server, both of which import `app.py` and call `db.create_all()`. Against an empty database the two processes raced, and whichever lost died with `table already exists`. The schema is now created once, before either of them starts. This had been the case since the scheduler was added; it went unnoticed because the database is kept in a volume, so the race only exists on the very first run.
   - The api never started in a container built on Windows. Git rewrites `entrypoint.sh` to CRLF on checkout, `COPY` carries that into the image, and the shell reads the carriage return as part of the command, so waitress looked for a module named `app:app` followed by a CR. A `.gitattributes` now keeps the line endings of anything the container executes.
   - CI ran the images through `docker compose build` but never started them, so a container that built perfectly and died on startup counted as a pass. It now brings the stack up and calls `/health` and `/api/dns` through the proxy.
+  - The container healthcheck asked for `localhost`, which resolves to `::1` first, while the server binds `0.0.0.0` and answers on IPv4 only. It now addresses `127.0.0.1`, as do the CI checks.
   - One test compared two timestamps that the api serializes to whole seconds. It passed on a slow machine and failed on a fast one, which is why CI had been red since the suite was added. It now compares the stored values, which keep microseconds.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
