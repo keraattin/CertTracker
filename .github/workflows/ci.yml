@@ -24,7 +24,9 @@ jobs:
 
       - name: Run tests
         working-directory: api
-        run: pytest
+        # Verbose with tracebacks: the log is the only place a failure
+        # here can be read from, and job logs are not public.
+        run: pytest -v --tb=short
 
   build:
     runs-on: ubuntu-latest
@@ -35,3 +37,25 @@ jobs:
       # here means a pin no longer installs.
       - name: Build the images
         run: docker compose build
+
+      # Building only proves the pins install, not that the thing runs.
+      # An entrypoint carrying CRLF line endings built perfectly and then
+      # died at startup, the carriage return having become part of the
+      # module name waitress was asked to import.
+      - name: Start the stack and check it answers
+        run: |
+          docker compose up -d
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/health >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:8080/health
+          curl -fsS http://localhost:8080/api/dns
+
+      - name: Show the logs if it did not
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose down -v

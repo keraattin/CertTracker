@@ -32,10 +32,14 @@
   - No network access and no docker required. The suite generates its own certificate and serves it over TLS on localhost, so the fetcher is tested against known dates and a known issuer instead of whatever a public host serves today. A small smtp server does the same for the notifications, and a socket that accepts a connection and then says nothing proves the TLS timeout works.
   - The frontend scripts run in an embedded javascript engine, so a syntax error fails the build rather than appearing as a blank page.
   - GitHub Actions runs the tests and a `docker compose build` on every push and pull request, on the same Python version as the image.
-- Same origin frontend (ISSUE_REF_PENDING):
+- Same origin frontend ([#21](https://github.com/keraattin/CertTracker/issues/21)):
   - The api address was written into the frontend javascript in eleven places as `http://localhost:5000`, so the project only ever worked on the machine it was built on. nginx now proxies `/api` to the api service and every call is a relative path.
   - A test fails the build if an absolute address finds its way back into the scripts.
   - The frontend waits for the api healthcheck before starting, since nginx resolves the api hostname once, at startup.
+- Fixes found by running the stack for real (ISSUE_REF_PENDING):
+  - The api never started in a container built on Windows. Git rewrites `entrypoint.sh` to CRLF on checkout, `COPY` carries that into the image, and the shell reads the carriage return as part of the command, so waitress looked for a module named `app:app` followed by a CR. A `.gitattributes` now keeps the line endings of anything the container executes.
+  - CI ran the images through `docker compose build` but never started them, so a container that built perfectly and died on startup counted as a pass. It now brings the stack up and calls `/health` and `/api/dns` through the proxy.
+  - One test compared two timestamps that the api serializes to whole seconds. It passed on a slow machine and failed on a fast one, which is why CI had been red since the suite was added. It now compares the stored values, which keep microseconds.
 
 ## [Version 2.0](https://github.com/keraattin/CertTracker/releases/tag/2.0)
 - [#1](https://github.com/keraattin/CertTracker/issues/1) Scheduled jobs added. All certificates will be checked everyday at 00:05 UTC
