@@ -1,0 +1,8 @@
+# Files that end up inside a Linux container must keep LF even when the
+# repository is checked out on Windows. Otherwise git rewrites them to
+# CRLF, COPY carries that into the image, and the shell treats the CR as
+# part of the command: the entrypoint failed with
+# "invalid format: 'app:app\r'" while the build itself looked fine.
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf

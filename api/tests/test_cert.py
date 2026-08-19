@@ -98,7 +98,13 @@ def test_failed_check_keeps_the_certificate_and_records_the_error(
     assert stored["last_update"] == fetched["last_update"]
     assert stored["last_check_status"] == "failed"
     assert stored["last_error"] is not None
-    assert stored["last_check"] != stored["last_update"]
+
+    # Compared on the model rather than on the json, which serializes
+    # datetimes to whole seconds: both checks can land inside the same
+    # second, and do on a machine fast enough.
+    with client.application.app_context():
+        row = Cert.query.filter_by(id=fetched["id"]).first()
+        assert row.last_check > row.last_update
 
 
 def test_failure_without_a_previous_certificate_stores_nothing(client):
