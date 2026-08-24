@@ -36,6 +36,12 @@
   - The api address was written into the frontend javascript in eleven places as `http://localhost:5000`, so the project only ever worked on the machine it was built on. nginx now proxies `/api` to the api service and every call is a relative path.
   - A test fails the build if an absolute address finds its way back into the scripts.
   - The frontend waits for the api healthcheck before starting, since nginx resolves the api hostname once, at startup.
+- Housekeeping:
+  - A malformed request body answered `500`. Flask raises before the view runs, and the error handler treated that like a server fault; it now reports the status Flask already decided on, so a bad request reads as the caller's mistake.
+  - Validation raises like every other application error instead of returning a response from outside a view. This was the last place reaching for Flask below the route layer, and the field errors now survive as structured `details` rather than only as a string.
+  - Deleting a DNS record takes its certificate with it through the relationship, rather than through a second delete in the service. Expressed in the ORM because SQLite cannot alter a foreign key on a table that already exists.
+  - The daily check runs at `CRON_HOUR:CRON_MINUTE`, no longer fixed at 00:05.
+  - Removed `Base.get_by`, which nothing ever called.
 - Certificate sources ([#5](https://github.com/keraattin/CertTracker/issues/5)):
   - A record now says where its certificate comes from. `tls` connects as before and stays the default, so nothing changes for existing records.
   - `saml` follows the metadata document an identity provider publishes and reads the certificate out of it. Those certificates are not served by a TLS handshake anywhere, which is what made them impossible to track. Where a document lists several, the one expiring soonest is recorded, since that is the one worth warning about.

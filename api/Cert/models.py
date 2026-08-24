@@ -47,8 +47,15 @@ class Cert(Base):
     dns_record_id = db.Column(
         db.String(LEN_ID), db.ForeignKey('dns_record.id'), unique=True
     )
+    # The backref carries the cascade: deleting a DNS record takes its
+    # certificate with it. Expressed in the ORM rather than as ON DELETE
+    # because SQLite cannot alter a foreign key on a table that already
+    # exists, and installations upgrading in place have one.
     dns_record = db.relationship(
-        "DnsRecord", foreign_keys=[dns_record_id]
+        "DnsRecord", foreign_keys=[dns_record_id],
+        backref=db.backref(
+            "cert", uselist=False, cascade="all, delete-orphan"
+        )
     )
     not_after = db.Column(
         db.DateTime, nullable=False
