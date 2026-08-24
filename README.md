@@ -46,6 +46,8 @@ You can find them in `/api/Dockerfile`
 | `TIMEZONE` | `Etc/UTC` | Timezone the daily job runs in. Stored datetimes are always UTC |
 | `DATABASE_URI` | `sqlite:////api/Database/database.db` | Overridable so the app can also run outside the container |
 | `LOG_FILE` | `./Logs/cron.log` | Log file of the daily job |
+| `CRON_HOUR` | `00` | Hour the daily check runs, in `TIMEZONE` |
+| `CRON_MINUTE` | `05` | Minute the daily check runs |
 
 ### Step 4 : Build the containers
 

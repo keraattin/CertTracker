@@ -99,13 +99,6 @@ class Base(db.Model):
         return [asdict(obj) for obj in cls.query.all()]
 
     @classmethod
-    def get_by(cls, filters):
-        obj = cls.query.filter_by(**filters).first()
-        if obj is None:
-            raise NotFoundError("couldn't found " + str(filters))
-        return asdict(obj)
-
-    @classmethod
     def update(cls, id, data):
         obj = cls.query.filter_by(id=id).first()
         if obj is None:

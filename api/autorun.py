@@ -14,6 +14,12 @@ from Shared.timezone import TZ
 # the scheduler can also run from somewhere else.
 LOG_FILE = os.environ.get('LOG_FILE') or './Logs/cron.log'
 
+# When the daily run happens, in the TIMEZONE the container runs with.
+# Overridable so an installation can move it off the hour everyone else
+# also picked.
+CRON_HOUR   = os.environ.get('CRON_HOUR') or '00'
+CRON_MINUTE = os.environ.get('CRON_MINUTE') or '05'
+
 log = logging.getLogger(__name__)
 logging.basicConfig(filename = LOG_FILE,
                     level = logging.INFO,
@@ -27,7 +33,7 @@ scheduler = BlockingScheduler(timezone=TZ)
 
 # Scheduled Job
 ##############################################################################
-@scheduler.scheduled_job('cron', hour="00", minute="05")
+@scheduler.scheduled_job('cron', hour=CRON_HOUR, minute=CRON_MINUTE)
 def job():
     log.info("job started")
     with app.app_context():

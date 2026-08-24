@@ -2,11 +2,15 @@
 
 # Libraries
 ##############################################################################
-from flask import jsonify
-from .status_codes import BAD_REQ
+from .exceptions import ValidationError
 ##############################################################################
 
 # Validators
+##############################################################################
+# Raises rather than returning a response: the route layer turns
+# application errors into JSON through @handle_errors, the same way the
+# service layer does. This was the last place that reached for Flask
+# from outside a view.
 ##############################################################################
 def validate_request(data,schema):
     schema_obj = schema()
@@ -14,8 +18,5 @@ def validate_request(data,schema):
     errors = schema_obj.validate(data)
     # If any Error Occurs
     if errors:
-        return jsonify({
-            "status":"fail",
-            "message":str(errors)
-        }),BAD_REQ
+        raise ValidationError(message=str(errors), details=errors)
 ##############################################################################

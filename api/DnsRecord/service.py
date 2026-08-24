@@ -4,16 +4,14 @@
 # Libraries
 ##############################################################################
 from .models import DnsRecord
-from Cert.models import Cert
-from Shared.exceptions import NotFoundError
 ##############################################################################
 
 
 # DNS Record Service
 ##############################################################################
-# Business rules for DNS records. Wraps the underlying repository helpers
-# and adds cross-aggregate concerns (e.g. cleaning up the cert that
-# references a deleted DNS record).
+# Business rules for DNS records. A thin pass through to the repository
+# helpers today: the cascade that used to live here now belongs to the
+# relationship between a record and its certificate.
 ##############################################################################
 class DnsRecordService:
 
@@ -35,14 +33,6 @@ class DnsRecordService:
 
     @staticmethod
     def delete(id):
-        # Behavior preserved from previous implementation: delete the DNS
-        # record first, then remove the associated cert if any. The
-        # ordering / cascade question is tracked separately as a follow-up.
-        result = DnsRecord.delete(id)
-        cert = Cert.query.filter_by(dns_record_id=id).first()
-        if cert is not None:
-            try:
-                Cert.delete(cert.id)
-            except NotFoundError:
-                pass
-        return result
+        # The certificate goes with the record: the relationship in
+        # Cert.models cascades, so there is nothing to tidy up here.
+        return DnsRecord.delete(id)

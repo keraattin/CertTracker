@@ -25,9 +25,7 @@ dns_bp = Blueprint('dns_record_blueprint', __name__)
 @handle_errors
 def create():
     data = request.get_json()
-    errors = validate_request(data=data, schema=CreateSchema)
-    if errors:
-        return errors
+    validate_request(data=data, schema=CreateSchema)
     return jsonify(DnsRecordService.create(data)), CREATED
 
 
@@ -47,9 +45,7 @@ def get_all():
 @handle_errors
 def update(id):
     data = request.get_json()
-    errors = validate_request(data=data, schema=UpdateSchema)
-    if errors:
-        return errors
+    validate_request(data=data, schema=UpdateSchema)
     return jsonify(DnsRecordService.update(id, data)), OK
 
 

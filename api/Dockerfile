@@ -21,5 +21,7 @@ ENV PORT 5000
 ENV DEBUG "False"
 ENV SECRET_KEY "thisistestsecretkey"
 ENV TIMEZONE "Etc/UTC"
+ENV CRON_HOUR "00"
+ENV CRON_MINUTE "05"
 
 CMD ["/bin/sh","/api/entrypoint.sh"]
