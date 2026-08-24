@@ -22,8 +22,8 @@ db = SQLAlchemy()
 ##############################################################################
 # db.create_all() creates missing tables but never touches existing ones,
 # so a column added to a model stays invisible to an installation that
-# already has a database. SQLite can add a nullable column in place,
-# which covers everything this project needs: the schema only grows.
+# already has a database. SQLite can add a column in place, which
+# covers everything this project needs: the schema only grows.
 #
 # Table and column names come from the models, never from user input.
 ##############################################################################
@@ -38,11 +38,21 @@ def ensure_columns():
         for column in table.columns:
             if column.name in known:
                 continue
-            column_type = column.type.compile(db.engine.dialect)
-            db.session.execute(text(
-                "ALTER TABLE " + table.name +
-                " ADD COLUMN " + column.name + " " + column_type
-            ))
+            clause = (
+                "ALTER TABLE " + table.name + " ADD COLUMN "
+                + column.name + " " + column.type.compile(db.engine.dialect)
+            )
+            # A NOT NULL column can only be added when there is a default
+            # to fill the rows that already exist with.
+            default = column.server_default
+            if default is not None:
+                value = getattr(default.arg, "text", None)
+                if value is None:
+                    value = "'" + str(default.arg) + "'"
+                clause += " DEFAULT " + value
+                if not column.nullable:
+                    clause += " NOT NULL"
+            db.session.execute(text(clause))
     db.session.commit()
 ##############################################################################
 

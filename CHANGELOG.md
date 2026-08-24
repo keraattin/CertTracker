@@ -36,7 +36,12 @@
   - The api address was written into the frontend javascript in eleven places as `http://localhost:5000`, so the project only ever worked on the machine it was built on. nginx now proxies `/api` to the api service and every call is a relative path.
   - A test fails the build if an absolute address finds its way back into the scripts.
   - The frontend waits for the api healthcheck before starting, since nginx resolves the api hostname once, at startup.
-- Fixes found by running the stack for real (ISSUE_REF_PENDING):
+- Certificate sources ([#5](https://github.com/keraattin/CertTracker/issues/5)):
+  - A record now says where its certificate comes from. `tls` connects as before and stays the default, so nothing changes for existing records.
+  - `saml` follows the metadata document an identity provider publishes and reads the certificate out of it. Those certificates are not served by a TLS handshake anywhere, which is what made them impossible to track. Where a document lists several, the one expiring soonest is recorded, since that is the one worth warning about.
+  - `upload` takes the certificate directly, in PEM or DER, for hosts this installation cannot reach. There is nothing to re-fetch, so the daily job skips these records and `Check Cert` is disabled for them. Uploading again replaces the certificate.
+  - `ssl_port` is now optional and defaults to 443: only the tls source connects to a port.
+- Fixes found by running the stack for real:
   - The api could fail to start on a fresh installation, and did so about half the time. `entrypoint.sh` starts the scheduler and the web server, both of which import `app.py` and call `db.create_all()`. Against an empty database the two processes raced, and whichever lost died with `table already exists`. The schema is now created once, before either of them starts. This had been the case since the scheduler was added; it went unnoticed because the database is kept in a volume, so the race only exists on the very first run.
   - The api never started in a container built on Windows. Git rewrites `entrypoint.sh` to CRLF on checkout, `COPY` carries that into the image, and the shell reads the carriage return as part of the command, so waitress looked for a module named `app:app` followed by a CR. A `.gitattributes` now keeps the line endings of anything the container executes.
   - CI ran the images through `docker compose build` but never started them, so a container that built perfectly and died on startup counted as a pass. It now brings the stack up and calls `/health` and `/api/dns` through the proxy.

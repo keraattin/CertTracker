@@ -34,8 +34,13 @@ def job():
         from DnsRecord.models import DnsRecord
         from Cert.service import CertService
         from Notification.service import NotificationService
+        from DnsRecord.restrictions import SOURCE_TLS, FETCHABLE_SOURCES
         dns_records = DnsRecord.query.all()
         for dns_record in dns_records:
+            # An uploaded certificate has nowhere to be fetched from
+            # again; it stays until someone uploads a new one.
+            if (dns_record.source or SOURCE_TLS) not in FETCHABLE_SOURCES:
+                continue
             try:
                 CertService.run_check(dns_record.id)
                 log.info(

@@ -3,8 +3,11 @@
 
 # Libraries
 ##############################################################################
-from marshmallow import Schema, fields, validate
-from  marshmallow.validate import Range
+from marshmallow import Schema, fields, validate, validates_schema
+from marshmallow import ValidationError
+from  marshmallow.validate import OneOf, Range
+
+from .restrictions import LEN_SOURCE_URL, SOURCES, SOURCE_SAML, PORT_DEFAULT
 ##############################################################################
 
 # Global Values
@@ -21,17 +24,41 @@ port_regex = (
 )
 PORT_MIN = 1
 PORT_MAX = 65535
+
 ##############################################################################
 
 # Schemas
 ##############################################################################
-class CreateSchema(Schema):
+# Shared by both schemas: a record only connects somewhere when its
+# source is tls, so the fields describing where to look are optional.
+class SourceMixin:
+    source = fields.Str(
+        required = False,
+        validate = OneOf(SOURCES)
+    )
+    source_url = fields.Url(
+        required = False,
+        schemes = {"http", "https"},
+        validate = validate.Length(max=LEN_SOURCE_URL)
+    )
+
+    @validates_schema
+    def check_source_url(self, data, **kwargs):
+        # A saml record is nothing without the document to read it from.
+        if data.get("source") == SOURCE_SAML and not data.get("source_url"):
+            raise ValidationError(
+                "source_url is required when source is saml", "source_url"
+            )
+
+
+class CreateSchema(Schema, SourceMixin):
     dns = fields.Str(
         required = True,
         validate = validate.Regexp(dns_regex)
     )
+    # Optional: only the tls source connects to a port.
     ssl_port = fields.Int(
-        required = True,
+        required = False,
         validate = [Range(
             min = PORT_MIN, 
             max = PORT_MAX,
@@ -39,7 +66,7 @@ class CreateSchema(Schema):
         )]
     )
 
-class UpdateSchema(Schema):
+class UpdateSchema(Schema, SourceMixin):
     dns = fields.Str(
         required = False,
         validate = validate.Regexp(dns_regex)

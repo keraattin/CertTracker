@@ -181,4 +181,14 @@ def test_missing_columns_are_added_to_an_existing_database(tmp_path):
         assert stored["issuer"] is None
         assert stored["notified_days"] is None
         assert CertService._with_status(stored)["status"] == STATUS_EXPIRED
+
+        # A column that is NOT NULL needs its default carried across as
+        # well, or the existing rows could not satisfy it.
+        from DnsRecord.models import DnsRecord
+        from DnsRecord.restrictions import SOURCE_TLS, PORT_DEFAULT
+        record = DnsRecord.get('dns-legacy01')
+        assert record["source"] == SOURCE_TLS
+        assert record["source_url"] is None
+        assert record["ssl_port"] == 443
+        assert PORT_DEFAULT == 443
 ##############################################################################

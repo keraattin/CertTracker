@@ -76,6 +76,19 @@ docker-compose up --build
 
 ![Add Dns](/docs/images/AddDns.png "AddDns")
 
+### Certificate Sources
+A record says where its certificate is read from. `Connect over TLS` is the default and behaves as it always has.
+
+| Source | What it needs | Refreshed daily |
+| --- | --- | --- |
+| Connect over TLS | DNS or IP, and the SSL port | Yes |
+| Read from SAML metadata | Address of the `metadata.xml` document | Yes |
+| Upload the certificate | Nothing; the certificate is handed over directly | No |
+
+`Read from SAML metadata` follows the document an identity provider publishes and reads the certificate embedded in it. Those certificates are not served by a TLS handshake anywhere, so following the document is the only way to track them. When a document lists several, the one expiring soonest is the one recorded.
+
+`Upload the certificate` is for hosts this installation cannot reach. Create the record, then use the `Upload Cert` button and either choose a PEM file or paste one. There is nothing to re-fetch afterwards, so the daily job leaves these records alone and `Check Cert` is disabled for them; uploading again replaces the certificate.
+
 ### Check Certificates 
 - After adding a DNS record, you may check the Certificate by clicking the `Check Cert` button under the actions section in the `DnsRecords` Page.
 
@@ -143,7 +156,7 @@ Both the tests and a `docker compose build` run on every push and pull request.
 - [X] [Add Scheduled Jobs to Check Certificates Daily]( https://github.com/keraattin/CertTracker/issues/1)
 - [X] [Add Send Mail Notification Function]( https://github.com/keraattin/CertTracker/issues/2)
 - [X] [Add Time Conversion to User Local Time in Frontend]( https://github.com/keraattin/CertTracker/issues/3)
-- [ ] [Permit upload of certificate and fetching SAML certificates from public SAML endpoints]( https://github.com/keraattin/CertTracker/issues/5)
+- [X] [Permit upload of certificate and fetching SAML certificates from public SAML endpoints]( https://github.com/keraattin/CertTracker/issues/5)
 
 ## License
 
