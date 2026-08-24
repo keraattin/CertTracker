@@ -61,6 +61,12 @@
                   </span>
                 </th>
                 <th>
+                  Source
+                  <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Where the certificate is read from">
+                    <i class="bi bi-info-circle"></i>
+                  </span>
+                </th>
+                <th>
                   Actions
                 </th>
               </tr>
@@ -83,14 +89,31 @@
           <div class="modal-body">
             <form>
               <div class="mb-3">
+                <label for="sourceInput" class="form-label">Source</label>
+                <select class="form-select" id="sourceInput" onchange="toggleSourceFields('')">
+                  <option value="tls" selected>Connect over TLS</option>
+                  <option value="saml">Read from SAML metadata</option>
+                  <option value="upload">Upload the certificate</option>
+                </select>
+                <div class="form-text">How the certificate is obtained</div>
+              </div>
+              <div class="mb-3">
                 <label for="dnsInput" class="form-label">DNS</label>
                 <input type="text" class="form-control" id="dnsInput" aria-describedby="dnsInputHelp" placeholder="example.com" required>
                 <div id="dnsInputHelp" class="form-text">Please put the Domain Name or Ip Address without http/s</div>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" id="sslPortField">
                 <label for="sslPortInput" class="form-label">SSL Port</label>
                 <input type="text" class="form-control" id="sslPortInput" aria-describedby="sslPortInputHelp" placeholder="443" required>
                 <div id="sslPortInputHelp" class="form-text">Please put the port of SSL</div>
+              </div>
+              <div class="mb-3" id="sourceUrlField" hidden>
+                <label for="sourceUrlInput" class="form-label">Metadata URL</label>
+                <input type="text" class="form-control" id="sourceUrlInput" aria-describedby="sourceUrlInputHelp" placeholder="https://idp.example.com/metadata.xml">
+                <div id="sourceUrlInputHelp" class="form-text">Address of the SAML metadata document</div>
+              </div>
+              <div class="mb-3" id="uploadHint" hidden>
+                <div class="form-text">Create the record first, then use the <strong>Upload Cert</strong> button to add the certificate.</div>
               </div>
             </form>
           </div>
@@ -117,14 +140,26 @@
             <form>
               <input type="hidden" id="updateDnsId" name="updateDnsId" value="">
               <div class="mb-3">
-                <label for="dnsInput" class="form-label">DNS</label>
+                <label for="updateSourceInput" class="form-label">Source</label>
+                <select class="form-select" id="updateSourceInput" onchange="toggleSourceFields('update')">
+                  <option value="tls">Connect over TLS</option>
+                  <option value="saml">Read from SAML metadata</option>
+                  <option value="upload">Upload the certificate</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="updateDnsInput" class="form-label">DNS</label>
                 <input type="text" class="form-control" id="updateDnsInput" aria-describedby="dnsInputHelp" placeholder="example.com" required>
                 <div id="dnsInputHelp" class="form-text">Please put the Domain Name or Ip Address without http/s</div>
               </div>
-              <div class="mb-3">
-                <label for="sslPortInput" class="form-label">SSL Port</label>
+              <div class="mb-3" id="updateSslPortField">
+                <label for="updateSslPortInput" class="form-label">SSL Port</label>
                 <input type="text" class="form-control" id="updateSslPortInput" aria-describedby="sslPortInputHelp" placeholder="443" required>
                 <div id="sslPortInputHelp" class="form-text">Please put the port of SSL</div>
+              </div>
+              <div class="mb-3" id="updateSourceUrlField" hidden>
+                <label for="updateSourceUrlInput" class="form-label">Metadata URL</label>
+                <input type="text" class="form-control" id="updateSourceUrlInput" placeholder="https://idp.example.com/metadata.xml">
               </div>
             </form>
           </div>
@@ -139,6 +174,39 @@
       </div>
     </div>
     
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadCertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadCertModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadCertModalLabel">Upload Certificate</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <input type="hidden" id="uploadDnsId" value="">
+              <div class="mb-3">
+                <label for="uploadCertFile" class="form-label">Certificate file</label>
+                <input type="file" class="form-control" id="uploadCertFile" accept=".pem,.crt,.cer,.der" onchange="readCertFile()">
+                <div class="form-text">PEM or DER. The contents appear below, where you can also paste them directly.</div>
+              </div>
+              <div class="mb-3">
+                <label for="uploadCertText" class="form-label">Certificate</label>
+                <textarea class="form-control" id="uploadCertText" rows="10" placeholder="-----BEGIN CERTIFICATE-----"></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary"
+              onclick="uploadCert(document.getElementById('uploadDnsId').value)">
+              Upload
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
 

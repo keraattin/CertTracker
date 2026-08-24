@@ -185,6 +185,25 @@ def test_every_element_id_the_dashboard_uses_exists():
     assert missing == []
 
 
+def test_every_element_id_the_records_page_uses_exists():
+    # The source picker and the upload modal are driven entirely by ids;
+    # a renamed one fails silently in a browser.
+    page = read_page("dnsrecords.html")
+    wanted = set(re.findall(
+        r"getElementById\(['\"]([A-Za-z]+)['\"]\)", read("dnsrecords.js")
+    ))
+    missing = [name for name in wanted if 'id="' + name + '"' not in page]
+    assert missing == []
+
+
+def test_the_source_picker_offers_every_source():
+    # Whatever the api accepts, the form has to be able to ask for.
+    from DnsRecord.restrictions import SOURCES
+    page = read_page("dnsrecords.html")
+    for source in SOURCES:
+        assert 'value="' + source + '"' in page
+
+
 def test_every_element_id_the_details_modal_uses_exists():
     page = read_page("certificates.html")
     wanted = set(re.findall(

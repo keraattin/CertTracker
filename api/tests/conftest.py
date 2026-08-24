@@ -104,7 +104,9 @@ def build_certificate(common_name, days_valid):
         .public_key(key.public_key())
         .serial_number(1234567890)
         .not_valid_before(now - timedelta(days=1))
-        .not_valid_after(now + timedelta(days=days_valid))
+        # An hour of slack, so days_remaining floors to days_valid
+        # rather than to one less than it.
+        .not_valid_after(now + timedelta(days=days_valid, hours=1))
         .add_extension(
             x509.SubjectAlternativeName([
                 x509.DNSName(common_name),

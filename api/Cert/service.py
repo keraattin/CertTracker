@@ -4,13 +4,20 @@
 # Libraries
 ##############################################################################
 from DnsRecord.models import DnsRecord
+from DnsRecord.restrictions import (
+    SOURCE_TLS,SOURCE_SAML,SOURCE_UPLOAD,FETCHABLE_SOURCES
+)
 from .models import Cert
 from .restrictions import (
     DAYS_EXPIRING,CHECK_OK,CHECK_FAILED,
     STATUS_VALID,STATUS_EXPIRING,STATUS_EXPIRED
 )
-from Shared.cert_checker import fetch_certificate
-from Shared.exceptions import NotFoundError, ConflictError, ExternalServiceError
+from Shared.cert_checker import (
+    fetch_certificate, fetch_saml_certificate, load_certificate
+)
+from Shared.exceptions import (
+    NotFoundError, ConflictError, ExternalServiceError, ValidationError
+)
 from Shared.timezone import as_utc, utc_now
 ##############################################################################
 
@@ -37,11 +44,17 @@ class CertService:
         if dns_record is None:
             raise NotFoundError(str(dns_record_id) + " not found")
 
-        try:
-            validity = fetch_certificate(
-                dns=str(dns_record.dns),
-                ssl_port=int(dns_record.ssl_port),
+        source = dns_record.source or SOURCE_TLS
+        if source not in FETCHABLE_SOURCES:
+            # An uploaded certificate has no origin to go back to; it can
+            # only be replaced by uploading another one.
+            raise ValidationError(
+                str(dns_record.dns) + " has an uploaded certificate, "
+                "which cannot be re-fetched"
             )
+
+        try:
+            validity = CertService._fetch(dns_record, source)
         except ExternalServiceError as e:
             # Remember the failure before letting the route turn it into
             # a 502, so the list stops presenting a stale certificate as
@@ -49,6 +62,12 @@ class CertService:
             CertService._record_failure(dns_record.id, e.message)
             raise
 
+        return CertService._save(dns_record, validity)
+
+    # Writes a certificate against its record, whichever source it came
+    # from. One row per record, so a second reading updates the first.
+    @staticmethod
+    def _save(dns_record, validity):
         now = utc_now()
         cert_data = {
             "dns_record_id": dns_record.id,
@@ -79,6 +98,29 @@ class CertService:
             if as_utc(existing.not_after) != validity["not_after"]:
                 cert_data["notified_days"] = None
             return CertService._with_status(Cert.update(existing.id, cert_data))
+
+    # Reads the certificate from wherever this record says it lives.
+    @staticmethod
+    def _fetch(dns_record, source):
+        if source == SOURCE_SAML:
+            return fetch_saml_certificate(str(dns_record.source_url))
+        return fetch_certificate(
+            dns=str(dns_record.dns),
+            ssl_port=int(dns_record.ssl_port),
+        )
+
+    # Stores a certificate that was handed to us rather than fetched. The
+    # record is switched to the upload source, so the daily job stops
+    # trying to reach a host that never answers.
+    @staticmethod
+    def store_upload(dns_record_id, data):
+        dns_record = DnsRecord.query.filter_by(id=dns_record_id).first()
+        if dns_record is None:
+            raise NotFoundError(str(dns_record_id) + " not found")
+
+        validity = load_certificate(data)
+        DnsRecord.update(dns_record.id, {"source": SOURCE_UPLOAD})
+        return CertService._save(dns_record, validity)
 
     # Only a record that was fetched successfully at least once has a row
     # to write the failure to. A host that never answered has nothing to
